@@ -4,9 +4,14 @@ use std::fs::read_to_string;
 ///////////////////////////////////////////////////////////////////////////////
 
 pub fn solve() -> SolutionPair {
-    // Your solution here...
-    let sol1: u64 = 0;
-    let sol2: u64 = 0;
+    let mut calories: Vec<u32> = read_to_string("input/day01.txt").unwrap()
+        .split("\n\n")
+        .map(|elf| elf.lines().map(|x| x.parse::<u32>().unwrap()).sum())
+        .collect();
 
-    (Solution::U64(sol1), Solution::U64(sol2))
+    calories.sort_unstable_by(|a, b| b.cmp(a));
+    let sol1 = calories[0];
+    let sol2 = calories[0..3].iter().sum();
+
+    (Solution::U32(sol1), Solution::U32(sol2))
 }
