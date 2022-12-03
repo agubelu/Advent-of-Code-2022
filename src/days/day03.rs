@@ -1,6 +1,5 @@
 use crate::{Solution, SolutionPair};
 use itertools::Itertools;
-use rustc_hash::FxHashSet; // slightly faster than std::collections::HashSet
 use std::fs::read_to_string;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -20,18 +19,12 @@ pub fn solve() -> SolutionPair {
 
 fn find_repeated<'a, I>(str_iter: I) -> u32 
 where I: IntoIterator<Item = &'a str> {
-    // Convert the string iterator to a collection of character hashsets
-    let mut sets: Vec<FxHashSet<char>> = str_iter.into_iter().map(|line| line.chars().collect()).collect();
-
-    // Find the character that is shared among all sets
-    let (intersect, others) = sets.split_at_mut(1);
-    let intersect = &mut intersect[0];
-    for other in others {
-        intersect.retain(|x| other.contains(x));
-    }
-
-    // It is guaranteed to contain exactly one character, convert it into its priority value
-    char2prio(*intersect.iter().next().unwrap())
+    // Turns each string into an u64 where a set bit indicates that it contains the item,
+    // and then ANDs them together to find the only common item
+    str_iter.into_iter()
+        .map(|string| string.chars().map(|ch| 1 << char2prio(ch)).fold(0, |a, b| a | b))
+        .fold(u64::MAX, |a, b| a & b)
+        .trailing_zeros()
 }
 
 fn char2prio(ch: char) -> u32 {
