@@ -1,3 +1,4 @@
+use scanf::sscanf;
 use itertools::Itertools;
 use crate::{Solution, SolutionPair};
 use crate::etc::utils::DOUBLE_NEWLINE;
@@ -41,14 +42,14 @@ fn process_stacks(stacks: &[Vec<char>], instructions: &[Instruction], new_model:
 fn read_stack(n: usize, header: &[&str]) -> Vec<char> {
     header.iter()
           .rev()
-          .skip(1)  // Skip the first one after reversing because it's the stack numbers
+          .skip(1)  // Skip the stack numbers
           .map(|line| line.chars().nth(4*n + 1).unwrap())
           .take_while(|ch| *ch != ' ')
           .collect()
 }
 
-// Reads an instruction from a line by splitting by spaces and parsing every other element
 pub fn line_to_instr(line: &str) -> Instruction {
-    let (amount, from, to) = line.split(' ').skip(1).step_by(2).map(|x| x.parse().unwrap()).next_tuple().unwrap();
+    let (mut amount, mut from, mut to) = (0, 0, 0);
+    sscanf!(line, "move {} from {} to {}", amount, from, to).expect("Error reading instruction");
     (amount, from - 1, to - 1)
 }
