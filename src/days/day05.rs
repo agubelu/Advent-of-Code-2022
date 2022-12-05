@@ -1,5 +1,6 @@
 use itertools::Itertools;
 use crate::{Solution, SolutionPair};
+use crate::etc::utils::DOUBLE_NEWLINE;
 use std::fs::read_to_string;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -8,11 +9,12 @@ type Instruction = (usize, usize, usize);
 
 pub fn solve() -> SolutionPair {
     let input = read_to_string("input/day05.txt").unwrap();
-    let (n_stacks, height) = get_stacks_info(&input);
-    let header: Vec<&str> = input.lines().take(height).collect();
+    let (header_text, body_text) = input.split_once(DOUBLE_NEWLINE).unwrap();
+    let header = header_text.lines().collect_vec();
 
+    let n_stacks = (header.last().unwrap().len() + 1) / 4;
     let stacks = (0..n_stacks).map(|i| read_stack(i, &header)).collect_vec();
-    let instrs = input.lines().skip(height + 2).map(line_to_instr).collect_vec();
+    let instrs = body_text.lines().map(line_to_instr).collect_vec();
 
     let sol1 = process_stacks(&stacks, &instrs, false);
     let sol2 = process_stacks(&stacks, &instrs, true);
@@ -35,23 +37,13 @@ fn process_stacks(stacks: &[Vec<char>], instructions: &[Instruction], new_model:
     stacks.iter().map(|st| st.last().unwrap()).collect()
 }
 
-// Finds the number of stacks and the maximum initial height of the stacks
-// by finding the line that starts with " 1  2 ..." and processing it
-fn get_stacks_info(input: &str) -> (usize, usize) {
-    let (height, line) = input.lines().enumerate()
-        .find(|(_, line)| line.starts_with(" 1"))
-        .unwrap();
-
-    let n_stacks = line.trim().split(' ').last().unwrap().parse().unwrap();
-    (n_stacks, height)
-}
-
 // Creates the nth stack by reading its contents from the header in the input
 fn read_stack(n: usize, header: &[&str]) -> Vec<char> {
     header.iter()
-          .map(|line| line.chars().nth(4*n + 1).unwrap())
-          .filter(|ch| *ch != ' ')
           .rev()
+          .skip(1)  // Skip the first one after reversing because it's the stack numbers
+          .map(|line| line.chars().nth(4*n + 1).unwrap())
+          .take_while(|ch| *ch != ' ')
           .collect()
 }
 
