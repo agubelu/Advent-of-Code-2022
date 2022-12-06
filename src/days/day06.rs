@@ -1,13 +1,21 @@
-#![allow(unused)]
+use itertools::Itertools;
 use crate::{Solution, SolutionPair};
 use std::fs::read_to_string;
 
 ///////////////////////////////////////////////////////////////////////////////
 
 pub fn solve() -> SolutionPair {
-    // Your solution here...
-    let sol1: u64 = 0;
-    let sol2: u64 = 0;
+    let input = read_to_string("input/day06.txt").unwrap().chars().collect_vec();
 
-    (Solution::U64(sol1), Solution::U64(sol2))
+    let sol1 = solve_for_length(&input, 4);
+    let sol2 = solve_for_length(&input, 14);
+    
+    (Solution::from(sol1), Solution::from(sol2))
+}
+
+fn solve_for_length(chars: &[char], len: usize) -> usize {
+    chars.windows(len)
+         .enumerate()
+         .find(|&(_, window)| window.iter().unique().count() == len)
+         .unwrap().0 + len
 }
