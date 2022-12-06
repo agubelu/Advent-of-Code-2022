@@ -15,7 +15,6 @@ pub fn solve() -> SolutionPair {
 
 fn solve_for_length(chars: &[char], len: usize) -> usize {
     chars.windows(len)
-         .enumerate()
-         .find(|&(_, window)| window.iter().unique().count() == len)
-         .unwrap().0 + len
+         .position(|window| window.iter().unique().count() == len)
+         .unwrap() + len
 }
