@@ -7,4 +7,5 @@ edition = "2021"
 
 [dependencies]
 itertools = "0.10.5"
+num-traits = "0.2.15"
 scanf = "1.2.1"
