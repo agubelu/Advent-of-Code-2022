@@ -1,6 +1,8 @@
 #![allow(unused)]
 use std::ops::{Index, IndexMut};
 use std::fmt::Display;
+use std::iter::Enumerate;
+use std::slice::Iter;
 use super::utils::Pos2D;
 use num_traits::int::PrimInt;
 
@@ -13,8 +15,8 @@ pub struct VecMat<T: Copy> {
 }
 
 pub struct VecMaxIndexedIter<'a, T: Copy> {
-    mat: &'a VecMat<T>,
-    i: usize
+    iter: Enumerate<Iter<'a, T>>,
+    mat: &'a VecMat<T>
 }
 
 impl<T: Copy> VecMat<T> {
@@ -32,7 +34,7 @@ impl<T: Copy> VecMat<T> {
     }
 
     pub fn indexed_iter(&self) -> VecMaxIndexedIter<T> {
-        VecMaxIndexedIter { mat: self, i: 0 }
+        VecMaxIndexedIter::new(self)
     }
 
     pub fn width(&self) -> usize {
@@ -82,17 +84,17 @@ impl<T: Copy, I: PrimInt + Display> IndexMut<(I, I)> for VecMat<T> {
     }
 }
 
+impl <'a, T: Copy> VecMaxIndexedIter<'a, T> {
+    pub fn new(mat: &'a VecMat<T>) -> Self {
+        let iter = mat.data.iter().enumerate();
+        Self { mat, iter }
+    }
+}
+
 impl<'a, T: Copy> Iterator for VecMaxIndexedIter<'a, T> {
     type Item = (Pos2D, T);
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.i < self.mat.len() {
-            let item = self.mat.data[self.i];
-            let pos = self.mat.coords(self.i);
-            self.i += 1;
-            Some((pos, item))
-        } else {
-            None
-        }
+        self.iter.next().map(|(i, x)| (self.mat.coords(i), *x))
     }
 }
