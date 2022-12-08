@@ -1,4 +1,4 @@
-// #![allow(unused)]
+#![allow(unused)]
 use std::ops::{Index, IndexMut};
 use std::fmt::Display;
 use super::utils::Pos2D;
@@ -27,16 +27,6 @@ impl<T: Copy> VecMat<T> {
         Self { width, height, data }
     }
 
-    pub fn get(&self, (x, y): Pos2D) -> T {
-        // No bounds check cause yolo
-        self.data[self.index(x, y)]
-    }
-
-    pub fn set(&mut self, (x, y): Pos2D, elem: T) {
-        let i = self.index(x, y);
-        self.data[i] = elem;
-    }
-
     pub fn flatten(&self) -> &[T] {
         &self.data
     }
@@ -53,15 +43,19 @@ impl<T: Copy> VecMat<T> {
         self.height
     }
 
-    pub fn size(&self) -> usize {
-        self.width * self.height
+    pub fn len(&self) -> usize {
+        self.data.len()
     }
 
-    pub fn index(&self, x: usize, y: usize) -> usize {
+    ////////////////////////////////////////////////////////////////////////////
+
+    fn index(&self, x: usize, y: usize) -> usize {
+        assert!(x < self.width(), "x index out of bounds: {} but width is {}", x, self.width());
+        assert!(y < self.height(), "y index out of bounds: {} but height is {}", y, self.height());
         y * self.height + x
     }
 
-    pub fn coords(&self, index: usize) -> Pos2D {
+    fn coords(&self, index: usize) -> Pos2D {
         (index % self.width, index / self.height)
     }
 }
@@ -69,20 +63,20 @@ impl<T: Copy> VecMat<T> {
 impl<T: Copy, I: PrimInt + Display> Index<(I, I)> for VecMat<T> {
     type Output = T;
     
-    fn index(&self, pos: (I, I)) -> &Self::Output {
+    fn index(&self, (x, y): (I, I)) -> &Self::Output {
         let i = self.index(
-            pos.0.to_usize().unwrap_or_else(|| panic!("X index not valid: {}", pos.0)), 
-            pos.1.to_usize().unwrap_or_else(|| panic!("Y index not valid: {}", pos.0))
+            x.to_usize().unwrap_or_else(|| panic!("X index not valid: {}", x)), 
+            y.to_usize().unwrap_or_else(|| panic!("Y index not valid: {}", y))
         );
         &self.data[i]
     }
 }
 
 impl<T: Copy, I: PrimInt + Display> IndexMut<(I, I)> for VecMat<T> {
-    fn index_mut(&mut self, pos: (I, I)) -> &mut Self::Output {
+    fn index_mut(&mut self, (x, y): (I, I)) -> &mut Self::Output {
         let i = self.index(
-            pos.0.to_usize().unwrap_or_else(|| panic!("X index not valid: {}", pos.0)), 
-            pos.1.to_usize().unwrap_or_else(|| panic!("Y index not valid: {}", pos.0))
+            x.to_usize().unwrap_or_else(|| panic!("X index not valid: {}", x)), 
+            y.to_usize().unwrap_or_else(|| panic!("Y index not valid: {}", y))
         );
         &mut self.data[i]
     }
@@ -92,7 +86,7 @@ impl<'a, T: Copy> Iterator for VecMaxIndexedIter<'a, T> {
     type Item = (Pos2D, T);
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.i < self.mat.size() {
+        if self.i < self.mat.len() {
             let item = self.mat.data[self.i];
             let pos = self.mat.coords(self.i);
             self.i += 1;
