@@ -1,20 +1,17 @@
 use crate::{Solution, SolutionPair};
 use crate::etc::utils::{UP, DOWN, LEFT, RIGHT};
 use crate::etc::coords::Coords;
-use std::collections::HashSet;
+use rustc_hash::FxHashSet;
 use std::fs::read_to_string;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-struct Instr {
-    direction: Coords<i32>,
-    times: i32
-}
+type Instr = (Coords<i32>, u32);
 
 pub fn solve() -> SolutionPair {
     let instructions: Vec<Instr> = read_to_string("input/day09.txt").unwrap()
         .lines()
-        .map(Instr::from_line)
+        .map(line_to_instr)
         .collect();
 
     let sol1 = solve_for_length::<2>(&instructions);
@@ -24,10 +21,10 @@ pub fn solve() -> SolutionPair {
 }
 
 fn solve_for_length<const N: usize>(instrs: &[Instr]) -> usize {
-    let mut visited = HashSet::new();
+    let mut visited = FxHashSet::default();
     let mut rope = [Coords::new(0, 0); N];
 
-    for Instr {direction, times} in instrs {
+    for (direction, times) in instrs {
         for _ in 0..*times {
             rope[0] = rope[0] + direction;
 
@@ -49,17 +46,15 @@ fn new_tail_pos(cur_head: Coords<i32>, prev_tail: Coords<i32>) -> Coords<i32> {
     }
 }
 
-impl Instr {
-    pub fn from_line(line: &str) -> Self {
-        let (d, n) = line.split_once(' ').unwrap();
-        let dir = match d {
-            "U" => UP,
-            "D" => DOWN,
-            "L" => LEFT,
-            "R" => RIGHT,
-            _ => unreachable!(),
-        };
+pub fn line_to_instr(line: &str) -> Instr {
+    let (d, n) = line.split_once(' ').unwrap();
+    let dir = match d {
+        "U" => UP,
+        "D" => DOWN,
+        "L" => LEFT,
+        "R" => RIGHT,
+        _ => unreachable!(),
+    };
 
-        Self { direction: Coords::from(dir), times: n.parse().unwrap() }
-    }
+    (Coords::from(dir), n.parse().unwrap())
 }

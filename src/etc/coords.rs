@@ -2,7 +2,7 @@ use std::ops::{Add, Sub};
 use num_traits::int::PrimInt;
 use num_traits::sign::Signed;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Coords<T: PrimInt + Signed> {
     pub x: T,
     pub y: T,
