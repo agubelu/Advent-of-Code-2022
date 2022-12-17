@@ -38,7 +38,7 @@ pub fn solve() -> SolutionPair {
     }
 
     let display = screen.iter().map(|row| row.iter().collect::<String>()).join("\n");
-    let sol2 = format!("\n{}", display);
+    let sol2 = format!("\n{display}");
 
     (Solution::from(sol1), Solution::from(sol2))
 }
