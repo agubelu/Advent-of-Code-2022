@@ -1,4 +1,4 @@
-use std::ops::{Add, Sub};
+use std::ops::{Add, Sub, AddAssign};
 use num_traits::int::PrimInt;
 use num_traits::sign::Signed;
 
@@ -8,9 +8,39 @@ pub struct Coords<T: PrimInt + Signed> {
     pub y: T,
 }
 
+pub struct SegmentIter<T: PrimInt + Signed> {
+    delta: Coords<T>,
+    current: Coords<T>,
+    end: Coords<T>,
+}
+
 impl<T: PrimInt + Signed> Coords<T> {
     pub const fn new(x: T, y: T) -> Self {
         Self { x, y }
+    }
+
+    // Iterates from this coordinate to the target coordinate, both inclusive
+    // Only works for coordinates that share at least one coordinate
+    pub fn iter_to(&self, other: &Self) -> SegmentIter<T> {
+        assert!(self.x == other.x || self.y == other.y, "At least one coordinate must be shared");
+        let dx = (other.x - self.x).signum();
+        let dy = (other.y - self.y).signum();
+        let delta = Self { x: dx, y: dy };
+        SegmentIter { delta: Self { x: dx, y: dy }, current: *self - delta, end: *other }
+    }
+}
+
+impl<T: PrimInt + Signed> Iterator for SegmentIter<T> {
+    type Item = Coords<T>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.current {
+            x if x == self.end => None,
+            _ => {
+                self.current += self.delta;
+                Some(self.current)
+            },
+        }
     }
 }
 
@@ -25,6 +55,12 @@ impl <T: PrimInt + Signed> Add<Coords<T>> for Coords<T> {
 
     fn add(self, rhs: Self) -> Self::Output {
         Self::new(self.x + rhs.x, self.y + rhs.y)
+    }
+}
+
+impl <T: PrimInt + Signed> AddAssign<Coords<T>> for Coords<T> {
+    fn add_assign(&mut self, rhs: Coords<T>) {
+        *self = *self + rhs;
     }
 }
 
