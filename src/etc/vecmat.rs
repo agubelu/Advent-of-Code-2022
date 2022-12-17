@@ -7,7 +7,7 @@ use super::utils::Pos2D;
 use num_traits::int::PrimInt;
 
 // A 2D-like matrix backed by a Vec
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct VecMat<T: Copy> {
     width: usize,
     height: usize,
@@ -54,11 +54,11 @@ impl<T: Copy> VecMat<T> {
     fn index(&self, x: usize, y: usize) -> usize {
         assert!(x < self.width(), "x index out of bounds: {} but width is {}", x, self.width());
         assert!(y < self.height(), "y index out of bounds: {} but height is {}", y, self.height());
-        y * self.height + x
+        y * self.width + x
     }
 
     fn coords(&self, index: usize) -> Pos2D {
-        (index % self.width, index / self.height)
+        (index % self.width, index / self.width)
     }
 }
 
@@ -67,8 +67,8 @@ impl<T: Copy, I: PrimInt + Display> Index<(I, I)> for VecMat<T> {
     
     fn index(&self, (x, y): (I, I)) -> &Self::Output {
         let i = self.index(
-            x.to_usize().unwrap_or_else(|| panic!("X index not valid: {}", x)), 
-            y.to_usize().unwrap_or_else(|| panic!("Y index not valid: {}", y))
+            x.to_usize().unwrap_or_else(|| panic!("X index not valid: {x}")), 
+            y.to_usize().unwrap_or_else(|| panic!("Y index not valid: {y}"))
         );
         &self.data[i]
     }
@@ -77,8 +77,8 @@ impl<T: Copy, I: PrimInt + Display> Index<(I, I)> for VecMat<T> {
 impl<T: Copy, I: PrimInt + Display> IndexMut<(I, I)> for VecMat<T> {
     fn index_mut(&mut self, (x, y): (I, I)) -> &mut Self::Output {
         let i = self.index(
-            x.to_usize().unwrap_or_else(|| panic!("X index not valid: {}", x)), 
-            y.to_usize().unwrap_or_else(|| panic!("Y index not valid: {}", y))
+            x.to_usize().unwrap_or_else(|| panic!("X index not valid: {x}")), 
+            y.to_usize().unwrap_or_else(|| panic!("Y index not valid: {y}"))
         );
         &mut self.data[i]
     }
