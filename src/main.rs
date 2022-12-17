@@ -19,7 +19,7 @@ fn main() {
     }
 
     let days: Vec<u8> = args[1..].iter()
-        .map(|x| x.parse().unwrap_or_else(|v| panic!("Not a valid day: {}", v)))
+        .map(|x| x.parse().unwrap_or_else(|v| panic!("Not a valid day: {v}")))
         .collect();
 
     let mut runtime = 0.0;
@@ -31,15 +31,15 @@ fn main() {
         let (p1, p2) = func();
         let elapsed_ms = time.elapsed().as_nanos() as f64 / 1_000_000.0;
         
-        println!("\n=== Day {:02} ===", day);
-        println!("  · Part 1: {}", p1);
-        println!("  · Part 2: {}", p2);
-        println!("  · Elapsed: {:.4} ms", elapsed_ms);
+        println!("\n=== Day {day:02} ===");
+        println!("  · Part 1: {p1}");
+        println!("  · Part 2: {p2}");
+        println!("  · Elapsed: {elapsed_ms:.4} ms");
 
         runtime += elapsed_ms;
     }
 
-    println!("Total runtime: {:.4} ms", runtime);
+    println!("Total runtime: {runtime:.4} ms");
 }
 
 fn get_day_solver(day: u8) -> fn() -> SolutionPair {
