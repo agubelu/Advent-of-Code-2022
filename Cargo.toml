@@ -7,6 +7,9 @@ edition = "2021"
 
 [dependencies]
 itertools = "0.10.5"
+lazy_static = "1.4.0"
 num-traits = "0.2.15"
+petgraph = "0.6.2"
+regex = "1.7.0"
 rustc-hash = "1.1.0"
 scanf = "1.2.1"
