@@ -77,8 +77,8 @@ impl<'a> MonkeyData<'a> {
         let left_val = map[left].resolve(map);
         let right_val = map[right].resolve(map);
 
-        let unknown_label = if left_val.is_unknown() { left } else { right };
-        let left_unknown = unknown_label == left;
+        let left_unknown = left_val.is_unknown();
+        let unknown_label = if left_unknown { left } else { right };
         let known_value = left_val.as_option().unwrap_or_else(|| right_val.unwrap());
 
         // Resolve the equation depending on the operation type and on which side it is
