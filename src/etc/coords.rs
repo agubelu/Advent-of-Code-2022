@@ -2,6 +2,7 @@ use std::ops::{Add, Sub, AddAssign};
 use num_traits::int::PrimInt;
 use num_traits::sign::Signed;
 
+/** A pair of signed integers representing 2D coordinates */
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Coords<T: PrimInt + Signed> {
     pub x: T,

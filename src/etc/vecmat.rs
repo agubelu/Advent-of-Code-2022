@@ -1,12 +1,15 @@
-#![allow(unused)]
 use std::ops::{Index, IndexMut};
 use std::fmt::Display;
 use std::iter::Enumerate;
 use std::slice::Iter;
-use super::utils::Pos2D;
-use num_traits::int::PrimInt;
 
-// A 2D-like matrix backed by a Vec
+use num_traits::int::PrimInt;
+use num_traits::sign::Signed;
+
+use super::utils::Pos2D;
+use super::coords::Coords;
+
+/** A 2D-like structure backed by a Vec */
 #[derive(Clone, Debug)]
 pub struct VecMat<T: Copy> {
     width: usize,
@@ -29,10 +32,6 @@ impl<T: Copy> VecMat<T> {
         Self { width, height, data }
     }
 
-    pub fn flatten(&self) -> &[T] {
-        &self.data
-    }
-
     pub fn indexed_iter(&self) -> VecMaxIndexedIter<T> {
         VecMaxIndexedIter::new(self)
     }
@@ -43,10 +42,6 @@ impl<T: Copy> VecMat<T> {
 
     pub fn height(&self) -> usize {
         self.height
-    }
-
-    pub fn len(&self) -> usize {
-        self.data.len()
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -83,6 +78,18 @@ impl<T: Copy, I: PrimInt + Display> IndexMut<(I, I)> for VecMat<T> {
         &mut self.data[i]
     }
 }
+
+impl<T, I> Index<Coords<I>> for VecMat<T>
+where T: Copy, 
+      I: PrimInt + Display + Signed
+{
+    type Output = T;
+
+    fn index(&self, Coords { x, y }: Coords<I>) -> &Self::Output {
+        &self[(x, y)]
+    }
+}
+
 
 impl <'a, T: Copy> VecMaxIndexedIter<'a, T> {
     pub fn new(mat: &'a VecMat<T>) -> Self {
