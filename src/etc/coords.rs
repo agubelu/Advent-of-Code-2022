@@ -89,6 +89,15 @@ impl <T: PrimInt + Signed> Sub<&Coords<T>> for Coords<T> {
     }
 }
 
+impl <T: PrimInt + Signed> Add<(T, T)> for Coords<T> {
+    type Output = Self;
+
+    fn add(self, rhs: (T, T)) -> Self::Output {
+        Self::new(self.x + rhs.0, self.y + rhs.1)
+    }
+}
+
+
 impl <T: PrimInt + Signed> Add<&(T, T)> for Coords<T> {
     type Output = Self;
 
