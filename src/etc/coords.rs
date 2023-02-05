@@ -29,6 +29,10 @@ impl<T: PrimInt + Signed> Coords<T> {
         let delta = Self { x: dx, y: dy };
         SegmentIter { delta: Self { x: dx, y: dy }, current: *self - delta, end: *other }
     }
+
+    pub fn manhattan_dist(&self, other: &Self) -> T {
+        (self.x - other.x).abs() + (self.y - other.y).abs()
+    }
 }
 
 impl<T: PrimInt + Signed> Iterator for SegmentIter<T> {
